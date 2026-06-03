@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letters of Kindness Portal</title>
+<style>
+    /* Basic Reset */
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {font-family: Arial, sans-serif; background:#f0f8ff; color:#333;}
+
+    /* Loading Page */
+    #loading {
+        position: fixed;
+        top:0; left:0; width:100%; height:100%;
+        background:#4CAF50; color:white;
+        display:flex; justify-content:center; align-items:center;
+        font-size:2em; z-index:1000;
+    }
+
+    /* Container */
+    .container {max-width:600px; margin:50px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+
+    h1 {text-align:center; margin-bottom:20px;}
+
+    label {display:block; margin:10px 0 5px;}
+    select, input[type="text"], textarea {width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;}
+    button {padding:10px 20px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer; margin-top:10px;}
+    button:hover {background:#45a049;}
+
+    #confirmation {display:none; text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="loading">Loading Letters of Kindness...</div>
+
+<div class="container" id="mainContent" style="display:none;">
+    <h1>Send a Letter of Kindness</h1>
+
+    <!-- Step 1: Choose theme -->
+    <div id="themeStep">
+        <label for="theme">Choose a theme or search:</label>
+        <input type="text" id="themeSearch" placeholder="Search theme...">
+        <select id="theme">
+            <option value="Get Well Soon">Get Well Soon</option>
+            <option value="Thank You">Thank You</option>
+            <option value="Stay Strong">Stay Strong</option>
+            <option value="Thinking of You">Thinking of You</option>
+        </select>
+        <button onclick="goToLetter()">Next</button>
+    </div>
+
+    <!-- Step 2: Write letter -->
+    <div id="letterStep" style="display:none;">
+        <label for="letterText">Write your letter:</label>
+        <textarea id="letterText" rows="8" placeholder="Your kind words here..."></textarea>
+        <button onclick="goToConfirm()">Next</button>
+    </div>
+
+    <!-- Step 3: Confirm submission -->
+    <div id="confirmStep" style="display:none;">
+        <h2>Confirm Your Letter</h2>
+        <p><strong>Theme:</strong> <span id="confirmTheme"></span></p>
+        <p><strong>Letter:</strong></p>
+        <p id="confirmLetter"></p>
+        <form id="letterForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <input type="hidden" name="theme" id="formTheme">
+            <input type="hidden" name="letter" id="formLetter">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Loading animation
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }, 1500); // show for 1.5 sec
+    });
+
+    // Theme search filter
+    const themeSearch = document.getElementById('themeSearch');
+    const themeSelect = document.getElementById('theme');
+    themeSearch.addEventListener('input', () => {
+        const filter = themeSearch.value.toLowerCase();
+        Array.from(themeSelect.options).forEach(option => {
+            option.style.display = option.text.toLowerCase().includes(filter) ? '' : 'none';
+        });
+    });
+
+    function goToLetter() {
+        const selectedTheme = themeSelect.value;
+        if(!selectedTheme) { alert('Please select a theme.'); return; }
+        document.getElementById('themeStep').style.display = 'none';
+        document.getElementById('letterStep').style.display = 'block';
+    }
+
+    function goToConfirm() {
+        const letter = document.getElementById('letterText').value.trim();
+        if(!letter) { alert('Please write your letter.'); return; }
+
+        const theme = themeSelect.value;
+        document.getElementById('confirmTheme').innerText = theme;
+        document.getElementById('confirmLetter').innerText = letter;
+
+        document.getElementById('formTheme').value = theme;
+        document.getElementById('formLetter').value = letter;
+
+        document.getElementById('letterStep').style.display = 'none';
+        document.getElementById('confirmStep').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
