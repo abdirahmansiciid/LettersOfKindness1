@@ -1,35 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letters of Kindness</title>
+<style>
+    /* Basic Reset */
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {font-family: Arial, sans-serif; background: linear-gradient(135deg,#dff6ff,#f5fbff); color:#333;}
+
+    /* Container */
+    .container {
+        max-width:700px;
+        margin:60px auto;
+        padding:40px;
+        background:white;
+        border-radius:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,.1);
+        text-align:center;
+    }
+
+    h1 {color:#2a7de1; margin-bottom:20px;}
+    h2 {color:#2a7de1; margin-bottom:15px;}
+    p {margin:10px 0;}
+    label {display:block; margin:10px 0 5px; text-align:left;}
+    select, input[type="text"], textarea {
+        width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;
+    }
+
+    button {
+        background:#2a7de1; color:white; border:none; padding:14px 28px; border-radius:10px;
+        font-size:16px; cursor:pointer; margin-top:15px;
+    }
+    button:hover {background:#1d66bc;}
+
+    #letterStep, #confirmStep, #mainContent {display:none;}
+</style>
+</head>
+<body>
+
+<!-- Landing Page -->
 <div id="landingPage" class="container">
     <h1>💙 Welcome to Letters of Kindness</h1>
-
-```
-<p>
-    A few kind words can brighten someone's day.
-    This portal allows you to send encouraging messages,
-    gratitude, and support to patients, families, and healthcare
-    workers in hospitals around the world.
-</p>
-
-<div style="margin:25px 0;">
-    <h3>How it works</h3>
-    <p>✓ Choose a theme</p>
-    <p>✓ Write your letter</p>
-    <p>✓ Review and submit</p>
+    <p>A few kind words can brighten someone's day. Send messages of hope, encouragement, and gratitude to patients, families, and healthcare workers in hospitals.</p>
+    <div style="margin:25px 0;">
+        <h3>How It Works</h3>
+        <p>✓ Choose a theme</p>
+        <p>✓ Write your letter</p>
+        <p>✓ Review your message</p>
+        <p>✓ Submit your kindness</p>
+    </div>
+    <button onclick="startPortal()">Start Writing</button>
 </div>
 
-<button onclick="startPortal()">
-    Start Writing a Letter
-</button>
-```
+<!-- Main Portal Content -->
+<div id="mainContent" class="container">
+    <h1>Send a Letter of Kindness</h1>
 
-</div>
+    <!-- Step 1: Choose theme -->
+    <div id="themeStep">
+        <label for="themeSearch">Search themes:</label>
+        <input type="text" id="themeSearch" placeholder="Type to filter themes...">
+        <label for="theme">Or choose from below:</label>
+        <select id="theme">
+            <option value="Get Well Soon">Get Well Soon</option>
+            <option value="Thank You">Thank You</option>
+            <option value="Stay Strong">Stay Strong</option>
+            <option value="Thinking of You">Thinking of You</option>
+        </select>
+        <button onclick="goToLetter()">Next</button>
+    </div>
 
-<div id="mainContent" class="container" style="display:none;">
-    <!-- Theme selection, letter writing, and confirmation steps go here -->
+    <!-- Step 2: Write Letter -->
+    <div id="letterStep">
+        <label for="letterText">Write your letter:</label>
+        <textarea id="letterText" rows="8" placeholder="Your kind words here..."></textarea>
+        <button onclick="goToConfirm()">Next</button>
+    </div>
+
+    <!-- Step 3: Confirm -->
+    <div id="confirmStep">
+        <h2>Confirm Your Letter</h2>
+        <p><strong>Theme:</strong> <span id="confirmTheme"></span></p>
+        <p><strong>Letter:</strong></p>
+        <p id="confirmLetter"></p>
+        <form id="letterForm" action="https://formspree.io/f/xaqzyegq" method="POST">
+            <input type="hidden" name="theme" id="formTheme">
+            <input type="hidden" name="letter" id="formLetter">
+            <button type="submit">Submit Letter</button>
+        </form>
+    </div>
 </div>
 
 <script>
-function startPortal() {
-    document.getElementById("landingPage").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-}
+    // Landing page -> main portal
+    function startPortal() {
+        document.getElementById('landingPage').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('themeStep').style.display = 'block';
+    }
+
+    // Filter theme options
+    const themeSearch = document.getElementById('themeSearch');
+    const themeSelect = document.getElementById('theme');
+    themeSearch.addEventListener('input', () => {
+        const filter = themeSearch.value.toLowerCase();
+        Array.from(themeSelect.options).forEach(option => {
+            option.style.display = option.text.toLowerCase().includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Step 1 -> Step 2
+    function goToLetter() {
+        const selectedTheme = themeSelect.value;
+        if (!selectedTheme) { alert('Please select a theme.'); return; }
+        document.getElementById('themeStep').style.display = 'none';
+        document.getElementById('letterStep').style.display = 'block';
+    }
+
+    // Step 2 -> Step 3
+    function goToConfirm() {
+        const letter = document.getElementById('letterText').value.trim();
+        if (!letter) { alert('Please write your letter.'); return; }
+        const theme = themeSelect.value;
+
+        document.getElementById('confirmTheme').innerText = theme;
+        document.getElementById('confirmLetter').innerText = letter;
+
+        document.getElementById('formTheme').value = theme;
+        document.getElementById('formLetter').value = letter;
+
+        document.getElementById('letterStep').style.display = 'none';
+        document.getElementById('confirmStep').style.display = 'block';
+    }
 </script>
+
+</body>
+</html>
